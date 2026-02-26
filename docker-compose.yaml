@@ -1,0 +1,38 @@
+services:
+  todo-list-db:
+    image: postgres:16.3-bullseye
+    container_name: todo-list-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: todolist@2025
+      POSTGRES_USER: todolist
+      POSTGRES_DB: todo_list_db
+    volumes:
+      - todo-list-vol:/var/lib/postgresql/data
+    networks:
+      - todo-list-net
+
+  todo-list-service:
+    image: benz3528/todo-list
+    container_name: todo-list-svc
+    ports:
+      - "8080:8080"
+    depends_on:
+      - todo-list-db
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      FILE_SERVER: ${FILE_SERVER}
+      FILE_PATH: ${FILE_PATH}
+    volumes:
+      - ./media:${FILE_PATH}
+    networks:
+      - todo-list-net
+
+volumes:
+  todo-list-vol:
+
+networks:
+  todo-list-net:
